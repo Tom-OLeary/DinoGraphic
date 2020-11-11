@@ -315,13 +315,11 @@ const setColor = () => "#" + parseInt(Math.random() * 0xffffff).toString(16);
  * @description - Displays infographic 'onclick' when the Compare Me! button is pressed
  */
 document.getElementById("btn").onclick = function () {
-
     human.species = document.getElementById("name").value;
     human.weight = document.getElementById("weight").value;
     human.feet = document.getElementById("feet").value;
     human.inches = document.getElementById("inches").value;
     human.diet = document.getElementById("diet").value;
-    
 
     if (validateForm()) {
         removeForm();
