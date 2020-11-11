@@ -5,8 +5,22 @@
  * --> app.js
  */
 
+ /**
+  * @description - Collects Dino Data from JSON File Asynchronously
+  */
+var dinos;
+(async () => {
+    try {
+        dinos = await fetch("./dino.json")
+        .then((result) => result.json())
+        .then((result) => result.Dinos);
+    } catch {
+        console.log("Could Not Fetch Data");
+    }
+})();
+
 /**
- * @description Represents a Dinosaur
+ * @description - Represents a Dinosaur
  * @constructor 
  * @param {string} image - An image of the dinosaur
  * @param {string} species - The species of dinosaur
@@ -29,6 +43,65 @@ function Dino(image, species, weight, height, diet, where, when, fact) {
     this.fact = fact;
 }
 
+/**
+ * @description - Create Dino Compare Method 1 --> Compares Weight (Dino Prototype)
+ * @param {Human} human - Human object
+ * @returns {string} Weight comparison result
+ */
+// NOTE: Weight in JSON file is in lbs, height in inches.
+Dino.prototype.compareWeight = function (human) {
+    let humanLbs = human.weight;
+    let dinoLbs = this.weight;
+    let comparison = dinoLbs / humanLbs;
+
+    let isHeavier = () => comparison >= 1;
+
+    const message = isHeavier()
+        ? "You are ~1/" + Math.round(comparison) + " the weight of the " + this.species
+        : "You are ~" + (1 - comparison.toFixed(2)) * 100 + "% heavier than the " + this.species;
+
+    return message;
+}
+
+/**
+ * @description - Create Dino Compare Method 2 --> Compares Height (Dino Prototype)
+ * @param {Human} human - Human object
+ * @returns {string} Height comparison result
+ */ 
+Dino.prototype.compareHeight = function (human) {
+    let dinoHeight = this.height; // Height in inches
+    let humanFeetVal = human.feet;
+    let humanInchVal = human.inches;
+    let humanInchTotal = humanFeetVal * 12 + humanInchVal;
+    let heightDifference = Math.abs(dinoHeight - humanInchTotal);
+    let dinoFeetVal = Math.floor(dinoHeight / 12);
+    let dinoInchRemainder = dinoHeight % 12; // Calculates remaining inches when converting to feet
+
+    let message = "At " + dinoFeetVal + "' " + dinoInchRemainder + "\"" + " tall, the " 
+                + this.species + " has a difference of " + heightDifference + " inches in height";
+
+    return message;
+}
+
+/** 
+* @description - Create Dino Compare Method 3 --> Compares Diet (Dino Prototype)
+* @param {Human} human - Human object
+* @returns {string} Diet comparison result
+*/
+Dino.prototype.compareDiet = function (human) {
+    let humanDiet = human.diet.toLowerCase();
+    let dinoDiet = this.diet;
+    let dinoSpecies = this.species;
+
+    let hasSameDiet = () => humanDiet === dinoDiet;
+
+    const message = hasSameDiet()
+        ? "You have the same diet type as the " + dinoSpecies + ": " + dinoDiet + "!"
+        : "The " + dinoSpecies + " is a(n) " + dinoDiet + " while you are a(n) " + humanDiet + "!";
+
+    return message;
+}
+
 /** 
  * @description Represents a Bird
  * @constructor 
@@ -41,10 +114,14 @@ function Dino(image, species, weight, height, diet, where, when, fact) {
  * @param {string} when - During which period the bird existed
  * @param {string} fact - A fact about the bird
  */  
-// Both Bird and Human inherit from Dino
+// Bird inherits from Dino
 function Bird(image, species, weight, height, diet, where, when, fact) {
     Dino.call(this, image, species, weight, height, diet, where, when, fact);
 }
+
+Bird.prototype = Object.create(Dino.prototype);
+Bird.prototype.constructor = Bird;
+
 
 /** 
  * @description Represents a Human
@@ -54,122 +131,53 @@ function Bird(image, species, weight, height, diet, where, when, fact) {
  * @param {number} weight - Weight in pounds of human
  * @param {number} height - Height in inches of human
  * @param {string} diet - Diet type of human
- * @param {string} where - Where the human lives
- * @param {string} when - During which period the human existed
- * @param {string} fact - A fact about the human
  */ 
-function Human(image, species, weight, height, diet, where, when, fact) {
-    Dino.call(this, image, species, weight, height, diet, where, when, fact)
+function Human(image, species, weight, height, diet) {
+    this.image = image;
+    this.species = species;
+    this.weight = weight;
+    Object.assign(this, height);
+    this.diet = diet;
 }
-    
+
+/**
+ * @description - Create Dino Objects and Randomize Order
+ * @returns {Array} Object array
+ */
 /* Create Dino Objects */
+function setDinos() {
+    let tileArray = [];
+    let dinosaurs;
 
-// Triceratops
-const triceratops = new Dino(
-    "images/triceratops.png",
-    "Triceratops",
-    13000,
-    114,
-    "herbavor",
-    "North America",
-    "Late Cretaceous",
-    "First discovered in 1889 by Othniel Charles Marsh"
-);
+    dinos.forEach(function (dino) {
+        if (dino.species !== "Pigeon"){
+            dinosaurs = dinos.map((dino) => new Dino(
+                `images/${dino.species.toLowerCase()}.png`, dino.species, dino.weight, dino.height, 
+                dino.diet, dino.where, dino.when, dino.fact));
+        } else {
+            dinosaurs = dinos.map((dino) => new Bird(
+                `images/${dino.species.toLowerCase()}.png`, dino.species, dino.weight, dino.height, 
+                dino.diet, dino.where, dino.when, dino.fact));
+        }
+    });
 
-// Tyrannasaurus Rex
-const tRex = new Dino(
-    "images/tRex.png",
-    "Tyrannosaurus Rex",
-    11905,
-    144,
-    "carnivor",
-    "North America",
-    "Late Cretaceous",
-    "The largest known skull measures in at 5 feet long."
-);
+    while (dinosaurs.length !== 0) {
+        let randomIndex = Math.floor(Math.random() * dinosaurs.length);
+        tileArray.push(dinosaurs[randomIndex]);
+        dinosaurs.splice(randomIndex, 1);
+    }
+    // Keeps human tile in center of grid
+    tileArray.splice(4, 0, human);
 
-// Anklyosaurus
-const anklyo = new Dino(
-    "images/anklyosaurus.png",
-    "Anklyosaurus",
-    10500,
-    55,
-    "herbavor",
-    "North America",
-    "Late Cretaceous",
-    "Anklyosaurus survived for approximately 135 million years."
-);
-
-// Brachiosaurus
-const brachio = new Dino(
-    "images/brachiosaurus.png",
-    "Brachiosaurus",
-    70000,
-    372,
-    "herbavor",
-    "North America",
-    "Late Jurasic",
-    "An asteroid was named 9954 Brachiosaurus in 1991."
-);
-
-// Stegosaurus
-const stego = new Dino(
-    "images/stegosaurus.png",
-    "Stegosaurus",
-    11600,
-    79,
-    "herbavor",
-    "North America, Europe, Asia",
-    "Late Jurasic to Early Cretaceous",
-    "The Stegosaurus had between 17 and 22 separate places and flat spines."
-);
-
-// Elasmosaurus
-const elasmo = new Dino(
-    "images/elasmosaurus.png",
-    "Elasmosaurus",
-    16000,
-    59,
-    "carnivor",
-    "North America",
-    "Late Cretaceous",
-    "Elasmosaurus was a marine reptile first discovered in Kansas."
-);
-
-// Pteranodon
-const pteranodon = new Dino(
-    "images/pteranodon.png",
-    "Pteranodon",
-    44,
-    20,
-    "carnivor",
-    "North America",
-    "Late Cretaceous",
-    "Actually a flying reptile, the Pteranodon is not a dinosaur."
-);
-
-// Pigeon
-const pigeon = new Bird(
-    "images/pigeon.png",
-    "Pigeon",
-    0.5,
-    9,
-    "herbavor",
-    "World Wide",
-    "Holocene",
-    ["All birds are living dinosaurs."]
-);
+    return tileArray;
+}
 
 /* Create Human Object */
-const human = new Human(
+let human = new Human(
     "images/human.png",
-    document.getElementById("name"),
-    document.getElementById("weight"),
-    document.getElementById("height"),
-    document.getElementById("diet"),
     "",
-    "",
-    "",
+    0,
+    0,
     ""
 );
 
@@ -179,19 +187,23 @@ const human = new Human(
  * @returns {string} Returns one of the available facts
  */
 function randomize(dino) {
-    let w = "The " + dino.species + " weighs " + dino.weight + "lbs!",
-        h = "The " + dino.species + " is " + dino.height + " inches tall!",
-        d = "Diet: " + dino.diet,
-        wh = "The " + dino.species + " could be found in " + dino.where,
-        whn = "The " + dino.species + " existed during the " + dino.when + " period",
-        f = dino.fact,
-        wc = weightComparison(dino),
-        hc = heightComparison(dino),
-        dc = compareDiet(dino);
-
-    const facts = [w, h, d, wh, whn, f, wc, hc, dc];
-    let message;
     let obj = dino.constructor.name;
+    let message;
+    let facts;
+
+    if (obj !== "Human") {
+        const w = "The " + dino.species + " weighs " + dino.weight + "lbs!",
+            h = "The " + dino.species + " is " + dino.height + " inches tall!",
+            d = "Diet: " + dino.diet,
+            wh = "The " + dino.species + " could be found in " + dino.where,
+            whn = "The " + dino.species + " existed during the " + dino.when + " period",
+            f = dino.fact,
+            wc = dino.compareWeight(human),
+            hc = dino.compareHeight(human),
+            dc = dino.compareDiet(human);
+            facts = [w, h, d, wh, whn, f, wc, hc, dc];
+    }
+
 
     // Bird always returns its designated fact, Human returns no fact
     switch (obj) {
@@ -207,64 +219,6 @@ function randomize(dino) {
     }
     return message;
 }    
-
-/**
- * @description - Create Dino Compare Method 1 --> Compares Weight
- * @param {Object} dino - Dino, Bird or Human object
- * @returns {string} Weight comparison result
- */
-// NOTE: Weight in JSON file is in lbs, height in inches. 
-function weightComparison(dino) {
-    let humanLbs = human.weight.value;
-    let dinoLbs = dino.weight;
-    let comparison = dinoLbs / humanLbs;
-
-    let isHeavier = () => comparison >= 1;
-
-    const message = isHeavier()
-        ? "You are ~1/" + Math.round(comparison) + " the weight of the " + dino.species
-        : "You are ~" + (1 - comparison.toFixed(2)) * 100 + "% heavier than the " + dino.species;
-
-    return message;
-}
-    
-/**
- * @description - Create Dino Compare Method 2 --> Compares Height
- * @param {Object} dino - Dino, Bird or Human object
- * @returns {string} Height comparison result
- */ 
-function heightComparison(dino) {
-    let dinoHeight = dino.height; // Height in inches
-    let humanFeetVal = document.getElementById("feet").value;
-    let humanInchVal = document.getElementById("inches").value;
-    let humanInchTotal = humanFeetVal * 12 + humanInchVal;
-    let heightDifference = Math.abs(dinoHeight - humanInchTotal);
-    let dinoFeetVal = Math.floor(dinoHeight / 12);
-    let dinoInchRemainder = dinoHeight % 12; // Calculates remaining inches when converting to feet
-    let message = "At " + dinoFeetVal + "' " + dinoInchRemainder + "\"" + " tall, the " 
-                + dino.species + " has a difference of " + heightDifference + " inches in height";
-
-    return message;
-}
-    
-/** 
-* @description - Create Dino Compare Method 3 --> Compares Diet 
-* @param {Object} dino - Dino, Bird or Human object
-* @returns {string} Diet comparison result
-*/
-function compareDiet(dino) {
-    let humanDiet = human.diet.value.toLowerCase();
-    let dinoDiet = dino.diet;
-    let dinoSpecies = dino.species;
-
-    let hasSameDiet = () => humanDiet === dinoDiet;
-
-    const message = hasSameDiet()
-        ? "You have the same diet type as the " + dinoSpecies + ": " + dinoDiet + "!"
-        : "The " + dinoSpecies + " is a(n) " + dinoDiet + " while you are a(n) " + humanDiet + "!";
-
-    return message;
-}
 
 /**
  * @description - Generate Tiles for each Dino in Array
@@ -342,28 +296,9 @@ function validateForm() {
 }
 
 /**
- * @description - Randomize order of tiles to be displayed
- * @returns {Array} Object array
- */
-function randomTiles() {
-    let tileArray = [];
-    let dinoArray = [triceratops, tRex, anklyo, brachio, stego, elasmo, pteranodon, pigeon];
-
-    while (dinoArray.length !== 0) {
-        let randomIndex = Math.floor(Math.random() * dinoArray.length);
-        tileArray.push(dinoArray[randomIndex]);
-        dinoArray.splice(randomIndex, 1);
-    }
-    // Keeps human tile in center of grid
-    tileArray.splice(4, 0, human);
-
-    return tileArray;
-}
-
-/**
  * @description - Add tiles to DOM
  */
-const addTiles = () => randomTiles().forEach(generateTiles);
+const addTiles = () => setDinos().forEach(generateTiles);
 
 /**
  * @description - Removes form from view
@@ -380,9 +315,15 @@ const setColor = () => "#" + parseInt(Math.random() * 0xffffff).toString(16);
  * @description - Displays infographic 'onclick' when the Compare Me! button is pressed
  */
 document.getElementById("btn").onclick = function () {
+    human.species = document.getElementById("name").value;
+    human.weight = document.getElementById("weight").value;
+    human.feet = document.getElementById("feet").value;
+    human.inches = document.getElementById("inches").value;
+    human.diet = document.getElementById("diet").value;
+    
     if (validateForm()) {
-        human.species = human.species.value;
         removeForm();
         addTiles();
     }
 }
+
