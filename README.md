@@ -45,8 +45,8 @@ To complete this project, your backend code must:
     > app.js - Backend JavaScript
     > app.css - Styles
     > index.html - View/Form Display
-    > dino.json - JSON formatted Dinosaur data
-    > images/ - Contains all images used in the project
+    > dino.json - JSON Formatted Dinosaur Data
+    > images/ - Grid Images
     
 ### Languages
 * JavaScript
