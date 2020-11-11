@@ -52,3 +52,6 @@ To complete this project, your backend code must:
 * JavaScript
 * HTML/CSS
 * JSON
+
+### Acknowledgements
+* The Udacity Team for providing the skeleton structure as well as the majority of HTML/CSS code.
