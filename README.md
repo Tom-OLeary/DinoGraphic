@@ -9,13 +9,15 @@ This project builds a 3x3 infographic to display dinosaur data and compare it to
 
 * Collect JSON data asynchronously, storing it in an array for later use. 
 
+### Install and Run
+
 * To preview the project online, commit the project to your github account. Access the index page at. https://github.com/path/to/project/index.html Copy that URL into https://htmlpreview.github.io/
 
 * Alternatively:
 ```
 git clone https://github.com/Tom-OLeary/DinoGraphic
 npm install && npm start
-(Must be run on a live web browser/localhost server in order to fetch JSON data correctly
+(Must be run on a live web browser/localhost server in order to fetch JSON data correctly)
 ```
 
 ### Project Features
