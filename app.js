@@ -250,10 +250,7 @@ function generateTiles(dino){
                             + "Fact: " + dino.fact;
     }
 
-    gridTile.appendChild(speciesType);
-    gridTile.appendChild(imageSource);
-    gridTile.appendChild(randomFact);
-    gridTile.appendChild(hoverEffect);
+    gridTile.append(speciesType, imageSource, randomFact, hoverEffect);
 
     document.getElementById("grid").appendChild(gridTile);
 }
