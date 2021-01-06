@@ -49,10 +49,8 @@ function Dino(image, species, weight, height, diet, where, when, fact) {
  * @returns {string} Weight comparison result
  */
 // NOTE: Weight in JSON file is in lbs, height in inches.
-Dino.prototype.compareWeight = function (human) {
-    let humanLbs = human.weight;
-    let dinoLbs = this.weight;
-    let comparison = dinoLbs / humanLbs;
+Dino.prototype.compareWeight = function ({ weight }) {
+    let comparison = this.weight / weight;
 
     let isHeavier = () => comparison >= 1;
 
@@ -70,9 +68,9 @@ Dino.prototype.compareWeight = function (human) {
  */ 
 Dino.prototype.compareHeight = function (human) {
     let dinoHeight = this.height; // Height in inches
-    let humanFeetVal = human.feet;
-    let humanInchVal = human.inches;
-    let humanInchTotal = humanFeetVal * 12 + humanInchVal;
+    let { height: { feet, inches }} = human;
+
+    let humanInchTotal = feet * 12 + inches;
     let heightDifference = Math.abs(dinoHeight - humanInchTotal);
     let dinoFeetVal = Math.floor(dinoHeight / 12);
     let dinoInchRemainder = dinoHeight % 12; // Calculates remaining inches when converting to feet
@@ -88,8 +86,8 @@ Dino.prototype.compareHeight = function (human) {
 * @param {Human} human - Human object
 * @returns {string} Diet comparison result
 */
-Dino.prototype.compareDiet = function (human) {
-    let humanDiet = human.diet.toLowerCase();
+Dino.prototype.compareDiet = function ({ diet }) {
+    let humanDiet = diet.toLowerCase();
     let dinoDiet = this.diet;
     let dinoSpecies = this.species;
 
@@ -187,17 +185,17 @@ let human = new Human(
  * @returns {string} Returns one of the available facts
  */
 function randomize(dino) {
+    let { species, diet, weight, height, where, when, fact } = dino;
     let obj = dino.constructor.name;
-    let message;
-    let facts;
+    let message, facts;
 
     if (obj !== "Human") {
-        const w = "The " + dino.species + " weighs " + dino.weight + "lbs!",
-            h = "The " + dino.species + " is " + dino.height + " inches tall!",
-            d = "Diet: " + dino.diet,
-            wh = "The " + dino.species + " could be found in " + dino.where,
-            whn = "The " + dino.species + " existed during the " + dino.when + " period",
-            f = dino.fact,
+        const w = "The " + species + " weighs " + weight + "lbs!",
+            h = "The " + species + " is " + height + " inches tall!",
+            d = "Diet: " + diet,
+            wh = "The " + species + " could be found in " + where,
+            whn = "The " + species + " existed during the " + when + " period",
+            f = fact,
             wc = dino.compareWeight(human),
             hc = dino.compareHeight(human),
             dc = dino.compareDiet(human);
@@ -208,7 +206,7 @@ function randomize(dino) {
     // Bird always returns its designated fact, Human returns no fact
     switch (obj) {
         case "Bird":
-            message = dino.fact
+            message = fact
             break
         case "Human":
             message = ""
@@ -225,29 +223,27 @@ function randomize(dino) {
  * @param {Object} dino - Dino, Bird or Human object
  */
 function generateTiles(dino){
-    let gridTile = document.createElement("div");
-    let speciesType = document.createElement("h3");
-    let imageSource = document.createElement("img");
-    let randomFact = document.createElement("p");
-    let hoverEffect = document.createElement("p");
+    let { species, image, weight, height, diet, where, when, fact } = dino;
+    let elements = ["div", "h3", "img", "p", "p"];
+    let [gridTile, speciesType, imageSource, randomFact, hoverEffect] = elements.map(e => document.createElement(e));
 
     // Generate HTML
     gridTile.className = "grid-item";
     gridTile.style.backgroundColor = setColor(); // Sets random color
-    speciesType.innerHTML = dino.species;
-    imageSource.src = dino.image;
+    speciesType.innerHTML = species;
+    imageSource.src = image;
     randomFact.innerHTML = randomize(dino);
 
     // Adds all facts to hover effect
     if (dino.constructor.name != "Human") {
         hoverEffect.className = "hover-data";
-        hoverEffect.innerHTML = "Species: " + dino.species + "<br />"
-                            + "Weight: " + dino.weight + " pounds" + "<br />"
-                            + "Height: " + dino.height + " inches" + "<br />"
-                            + "Diet: " + dino.diet + "<br />"
-                            + "Where: " + dino.where + "<br />"
-                            + "When: " + dino.when + "<br />"
-                            + "Fact: " + dino.fact;
+        hoverEffect.innerHTML = "Species: " + species + "<br />"
+                            + "Weight: " + weight + " pounds" + "<br />"
+                            + "Height: " + height + " inches" + "<br />"
+                            + "Diet: " + diet + "<br />"
+                            + "Where: " + where + "<br />"
+                            + "When: " + when + "<br />"
+                            + "Fact: " + fact;
     }
 
     gridTile.append(speciesType, imageSource, randomFact, hoverEffect);
@@ -259,11 +255,9 @@ function generateTiles(dino){
  * @description - Validates the form
  * @returns {boolean} - Checks for missing fields
  */
-function validateForm() {
-    let name = document.getElementById("name");
-    let feet = document.getElementById("feet");
-    let inches = document.getElementById("inches");
-    let weight = document.getElementById("weight");
+function validateForm() { 
+    let formIds = ["name", "feet", "inches", "height"];
+    let [name, feet, inches, weight] = formIds.map(id => document.getElementById(id));
 
     if (name.value === "") {
         alert("Please enter a name!");
