@@ -224,7 +224,7 @@ function randomize(dino) {
  */
 function generateTiles(dino){
     let { species, image, weight, height, diet, where, when, fact } = dino;
-    let elements = ["div", "h3", "img", "p", "p"];
+    let elements = ['div', 'h3', 'img', 'p', 'p'];
     let [gridTile, speciesType, imageSource, randomFact, hoverEffect] = elements.map(e => document.createElement(e));
 
     // Generate HTML
