@@ -208,9 +208,9 @@
  
      // Bird always returns its designated fact, Human returns no fact
      switch (obj) {
-         case "Bird":
-             message = fact
-             break
+        //  case "Bird":
+        //      message = fact
+        //      break
          case "Human":
              message = ""
              break

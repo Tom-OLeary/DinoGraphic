@@ -1,0 +1,19 @@
+{
+  "name": "dinographic",
+  "version": "1.0.0",
+  "description": "This project builds a 3x3 infographic to display dinosaur data and compare it to user inputted human data.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tom-OLeary/DinoGraphic.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tom-OLeary/DinoGraphic/issues"
+  },
+  "homepage": "https://github.com/Tom-OLeary/DinoGraphic#readme"
+}
